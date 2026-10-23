@@ -1,3 +1,15 @@
+name: Build ENFINET OPC APK
+
+on:
+workflow_dispatch:
+push:
+branches:
+- main
+
+jobs:
+build:
+runs-on: ubuntu-24.04
+
 steps:
   - name: Checkout source
     uses: actions/checkout@v4
@@ -13,17 +25,19 @@ steps:
       distribution: temurin
       java-version: '17'
 
-  - name: Check project files
+  - name: Check project structure
     run: |
-      echo "Checking project files"
+      echo "Checking project files..."
       ls -la
+      echo "Checking www directory..."
       ls -la www
+      test -f package.json
       test -f www/index.html
 
   - name: Install dependencies
     run: npm ci
 
-  - name: Add Android platform
+  - name: Add Android platform if missing
     run: |
       if [ ! -d android ]; then
         npx cap add android
@@ -32,7 +46,7 @@ steps:
   - name: Sync Capacitor
     run: npx cap sync android
 
-  - name: Build APK
+  - name: Build Android APK
     run: |
       cd android
       chmod +x gradlew
@@ -41,7 +55,6 @@ steps:
   - name: Upload APK
     uses: actions/upload-artifact@v4
     with:
-      name: enfinet-opc-apk
+      name: ENFINET-OPC-APK
       path: android/app/build/outputs/apk/debug/app-debug.apk
       if-no-files-found: error
-      
