@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -28,26 +28,17 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Add Android platform
-        run: npx cap add android
-
-      - name: Sync Android
-        run: npx cap sync android
-
-      - name: Build APK
-        working-directory: android
-        run: chmod +x gradlew && ./gradlew assembleDebug
+      - name: Build Android APK
+        run: |
+          npx cap add android
+          npx cap sync android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ENFINET-OPC-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
-
-5. Pindutin ang **Commit changes** at kumpirmahin ang pag-save.
-
-## Hakbang 3: Bago patakbuhin
-
-May isang mahalagang kondisyon: kailangang nasa root ng repository ang `package.json`, `capacitor.config.json`, at folder na `www`. Kung ZIP lang ang in-upload mo, maaaring hindi makita ng workflow ang mga ito.
-
-**Pagkatapos mong gawin ang Hakbang 1, i-send mo muna ang screenshot ng Code tab.** Titingnan natin ang laman ng repository bago patakbuhin ang build para maiwasan ang error.
+          if-no-files-found: error
