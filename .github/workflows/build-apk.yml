@@ -1,60 +1,43 @@
 name: Build ENFINET OPC APK
-
 on:
 workflow_dispatch:
 push:
 branches:
 - main
-
 jobs:
 build:
 runs-on: ubuntu-24.04
-
 steps:
-  - name: Checkout source
-    uses: actions/checkout@v4
-
-  - name: Setup Node.js
-    uses: actions/setup-node@v4
-    with:
-      node-version: 22
-
-  - name: Setup Java
-    uses: actions/setup-java@v5
-    with:
-      distribution: temurin
-      java-version: '17'
-
-  - name: Check project structure
-    run: |
-      echo "Checking project files..."
-      ls -la
-      echo "Checking www directory..."
-      ls -la www
-      test -f package.json
-      test -f www/index.html
-
-  - name: Install dependencies
-    run: npm ci
-
-  - name: Add Android platform if missing
-    run: |
-      if [ ! -d android ]; then
-        npx cap add android
-      fi
-
-  - name: Sync Capacitor
-    run: npx cap sync android
-
-  - name: Build Android APK
-    run: |
-      cd android
-      chmod +x gradlew
-      ./gradlew assembleDebug
-
-  - name: Upload APK
-    uses: actions/upload-artifact@v4
-    with:
-      name: ENFINET-OPC-APK
-      path: android/app/build/outputs/apk/debug/app-debug.apk
-      if-no-files-found: error
+- name: Checkout source
+uses: actions/checkout@v4
+- name: Setup Node.js
+uses: actions/setup-node@v4
+with:
+node-version: 22
+- name: Setup Java
+uses: actions/setup-java@v5
+with:
+distribution: temurin
+java-version: '17'
+- name: Check project files
+run: |
+ls -la
+test -f package.json
+test -f www/index.html
+- name: Install dependencies
+run: npm install
+- name: Add Android platform
+run: npx cap add android
+- name: Sync Capacitor
+run: npx cap sync android
+- name: Build APK
+run: |
+cd android
+chmod +x gradlew
+./gradlew assembleDebug
+- name: Upload APK
+uses: actions/upload-artifact@v4
+with:
+name: ENFINET-OPC-APK
+path: android/app/build/outputs/apk/debug/app-debug.apk
+if-no-files-found: error
