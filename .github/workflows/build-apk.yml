@@ -29,13 +29,32 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Check project files
+      - name: Diagnose project files
         run: |
-          echo "Checking required project files..."
-          test -f package.json
-          test -f capacitor.config.json
-          test -f www/index.html
-          echo "All required files are present."
+          echo "=== ROOT DIRECTORY ==="
+          pwd
+          ls -la
+
+          echo "=== CHECK REQUIRED FILES ==="
+
+          if [ ! -f package.json ]; then
+            echo "ERROR: package.json is missing from the root directory."
+            exit 1
+          fi
+
+          if [ ! -f capacitor.config.json ]; then
+            echo "ERROR: capacitor.config.json is missing from the root directory."
+            exit 1
+          fi
+
+          if [ ! -f www/index.html ]; then
+            echo "ERROR: www/index.html is missing."
+            echo "The www folder must be in the root directory."
+            ls -la www || true
+            exit 1
+          fi
+
+          echo "SUCCESS: All required files are present."
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
@@ -46,7 +65,7 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Build APK
+      - name: Build debug APK
         run: |
           cd android
           chmod +x gradlew
