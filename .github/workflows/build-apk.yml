@@ -6,8 +6,12 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build:
+    name: Build Android APK
     runs-on: ubuntu-22.04
 
     steps:
@@ -17,39 +21,43 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Check required files
+      - name: Verify project files
         run: |
-          echo "Checking project files..."
-          ls -la
+          echo "Checking required files..."
           test -f package.json
           test -f capacitor.config.json
           test -f www/index.html
+          echo "All required files found."
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
 
-      - name: Prepare Android project
+      - name: Add Android platform
         run: npx cap add android
 
-      - name: Synchronize Android
+      - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Build APK
+      - name: Build debug APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ENFINET-OPC-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
