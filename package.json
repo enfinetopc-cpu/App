@@ -2,9 +2,9 @@
   "name": "enfinet-opc-subscriber",
   "version": "1.0.0",
   "private": true,
-  "description": "ENFINET OPC Subscriber Android app starter",
+  "description": "ENFINET OPC Subscriber Android Application",
   "scripts": {
-    "build": "echo Static app: no build step required"
+    "build": "echo Build started"
   },
   "dependencies": {
     "@capacitor/android": "6.2.1",
