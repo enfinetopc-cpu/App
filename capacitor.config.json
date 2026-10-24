@@ -1,6 +1,5 @@
 {
   "appId": "com.enfinetopc.subscriber",
   "appName": "ENFINET OPC",
-  "webDir": "www",
-  "bundledWebRuntime": false
+  "webDir": "www"
 }
